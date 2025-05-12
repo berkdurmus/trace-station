@@ -1,0 +1,44 @@
+{
+  "name": "trace-station",
+  "version": "1.0.0",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "dev": "ts-node -r tsconfig-paths/register src/index.ts",
+    "cli": "ts-node src/ui/cli.ts",
+    "fetch-docs": "ts-node -r tsconfig-paths/register src/trace/services/fetch.docs.service.ts",
+    "enhance-docs": "ts-node -r tsconfig-paths/register src/trace/services/enhance.docs.service.ts",
+    "update-docs": "npm run fetch-docs && npm run enhance-docs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.15.12",
+    "@types/unzipper": "^0.10.11",
+    "jest": "^29.7.0",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@langchain/anthropic": "^0.3.20",
+    "@langchain/community": "^0.3.42",
+    "@langchain/core": "^0.3.53",
+    "@langchain/langgraph": "^0.2.68",
+    "@playwright/test": "^1.52.0",
+    "chalk": "^4.1.2",
+    "commander": "^13.1.0",
+    "langchain": "^0.3.24",
+    "ora": "^8.2.0",
+    "unzipper": "^0.12.3",
+    "zod": "^3.24.4"
+  }
+}
