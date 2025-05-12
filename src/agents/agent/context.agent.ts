@@ -3,7 +3,6 @@ import { AgentInput, ContextOutput, ILanguageModelProvider } from "@/agents";
 import { ParsedTrace } from "@/trace";
 import { z } from "zod";
 import { StructuredOutputParser } from "langchain/output_parsers";
-import { displayContext } from "@/cli";
 import { PlaywrightDocs } from "@/trace/classes/playwright.docs.class";
 import { DocumentationChunk } from "@/trace/interfaces";
 

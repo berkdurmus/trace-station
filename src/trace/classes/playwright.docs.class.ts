@@ -1,7 +1,6 @@
 import { ParsedTrace } from "@/trace";
 import { Document } from "langchain/document";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
-import { Chroma } from "@langchain/community/vectorstores/chroma";
 import { OpenAIEmbeddings } from "@langchain/openai";
 import * as fs from "fs";
 import * as path from "path";

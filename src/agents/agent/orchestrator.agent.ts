@@ -1,10 +1,5 @@
 import { BaseAgent } from "./base.agent";
-import {
-  AgentInput,
-  AgentOutput,
-  SynthesisOutput,
-  OrchestratorAgentInterface,
-} from "@/agents";
+import { AgentInput, OrchestratorAgentInterface } from "@/agents";
 import { z } from "zod";
 import { StructuredOutputParser } from "langchain/output_parsers";
 import { ParsedTrace } from "@/trace";
@@ -218,35 +213,5 @@ Status Code Distribution: ${Object.entries(statusCodes)
       .join(", ")}
 
 `;
-  }
-
-  async synthesizeResults(
-    trace: any,
-    taskResults: Record<string, AgentOutput>
-  ): Promise<SynthesisOutput> {
-    // Implementation for synthesizing results from multiple tasks (if needed)
-    // ...
-    return {
-      result: {
-        summary: "Synthesis not implemented.",
-        insights: [],
-        overallAssessment: "N/A",
-      },
-    };
-  }
-
-  private extractSection(
-    text: string,
-    sectionName: string
-  ): string | undefined {
-    // Implementation for extracting a section from text (if needed)
-    // ...
-    return undefined;
-  }
-
-  private extractListItems(text: string, sectionName: string): string[] {
-    // Implementation for extracting list items from a section (if needed)
-    // ...
-    return [];
   }
 }

@@ -3,7 +3,6 @@ import { AgentInput, DiagnosisOutput, ILanguageModelProvider } from "@/agents";
 import { ParsedTrace } from "@/trace";
 import { z } from "zod";
 import { StructuredOutputParser } from "langchain/output_parsers";
-import { displayDiagnosis } from "@/cli";
 
 export class DiagnosisAgent extends BaseAgent<DiagnosisOutput> {
   private outputParser: StructuredOutputParser<any>;

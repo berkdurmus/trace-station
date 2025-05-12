@@ -10,7 +10,6 @@ const chalk = require("chalk");
 import * as fs from "fs";
 import { startChatSession } from "./chat.service";
 import { fetchPlaywrightDocs } from "@/trace/services/fetch.docs.service";
-import { createOrchestratedWorkflow } from "@/workflow/services/orchestrated.graph.workflow";
 
 export async function setupOrchestratedAnalyzeCLI(program: Command) {
   program

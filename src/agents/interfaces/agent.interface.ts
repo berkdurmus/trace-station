@@ -69,16 +69,6 @@ export interface OrchestratorAgentInterface {
    * @param input Agent input
    */
   process(input: AgentInput): Promise<any>;
-
-  /**
-   * Synthesize results from multiple task outputs
-   * @param trace The trace data
-   * @param taskResults The results from all tasks
-   */
-  synthesizeResults(
-    trace: any,
-    taskResults: Record<string, AgentOutput>
-  ): Promise<AgentOutput>;
 }
 
 // Specialized orchestration outputs

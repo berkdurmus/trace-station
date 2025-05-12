@@ -58,9 +58,6 @@ their Playwright test issues.
   async formatInput(input: AgentInput): Promise<string> {
     const { trace, context } = input;
 
-    // Get user query from context
-    const userQuery = context?.userQuery || "Tell me about this test failure";
-
     // Format trace data for agent input
     let traceContext = "";
     if (trace) {
