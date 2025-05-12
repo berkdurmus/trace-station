@@ -342,5 +342,6 @@ By default, RAG is enabled (`--rag` is set to true). When you use the `--no-rag`
 
 - We can support visual analysis of screenshots from traces.
 
+- This is a full CLI app, we can create backend api + frontend for this. 
 
 
