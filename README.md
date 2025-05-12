@@ -1,6 +1,6 @@
 # TraceStation: Playwright Debug Agent
 
-An AI-powered debugging assistant for Playwright tests that analyzes test failures and provides actionable recommendations.
+TraceStation (Not by Sony) is an AI-powered debugging assistant for Playwright tests that analyzes test failures and provides actionable recommendations.
 
 ## Features
 
