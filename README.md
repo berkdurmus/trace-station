@@ -37,15 +37,10 @@ The tool uses AI models that require API keys. You can provide them in several w
 
 1. Use a .env file in the project root:
    ```
-   ANTHROPIC_API_KEY = 'sk-ant-xxxx...your-anthropic-api-key-here...xxxx'
-   OPENAI_API_KEY = 'sk-xxxx...your-openai-api-key-here...xxxx'
+   ANTHROPIC_API_KEY = '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'
+   OPENAI_API_KEY = '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'
    ```
 
-
-2. Pass as a command line parameter:
-   ```bash
-   npm run dev -- analyze path/to/onboarding-trace.zip -k your-api-key-here
-   ```
 
 ### Analyzing a Trace File
 
