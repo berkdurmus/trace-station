@@ -1,4 +1,4 @@
-# Playwright Debug Agent
+# TraceStation: Playwright Debug Agent
 
 An AI-powered debugging assistant for Playwright tests that analyzes test failures and provides actionable recommendations.
 
@@ -24,7 +24,7 @@ npm install
 # Build the project
 npm run build
 
-# Update documentation sources
+# Fetch+update docs for the first time
 npm run update-docs
 ```
 
@@ -34,42 +34,31 @@ npm run update-docs
 
 The tool uses AI models that require API keys. You can provide them in several ways:
 
-1. Set environment variables directly when running commands:
-   ```bash
-   ANTHROPIC_API_KEY=your-key-here npm run dev -- analyze path/to/trace.zip
+
+1. Use a .env file in the project root:
+   (Since this is a private repo I'm giving my Anthropic api key and openai api key here.)
+   ```
+   ANTHROPIC_API_KEY = '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'
+   OPENAI_API_KEY = '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'
    ```
 
-2. Use a .env file in the project root:
-   ```
-   ANTHROPIC_API_KEY=your-key-here
-   OPENAI_API_KEY=your-openai-key-here
-   ```
 
-3. Pass as a command line parameter:
+2. Pass as a command line parameter:
    ```bash
-   npm run dev -- analyze path/to/trace.zip -k your-api-key
+   npm run dev -- analyze path/to/gateway-trace.zip
    ```
 
 ### Analyzing a Trace File
 
 ```bash
 # Basic analysis
-npm run dev -- analyze path/to/your/trace.zip
-
-# With your Anthropic API key
-npm run dev -- analyze path/to/your/trace.zip -k your-api-key
-
-# With verbose documentation processing logs
-npm run dev -- analyze path/to/your/trace.zip -v
+npm run dev -- analyze path/to/your/onboarding-trace.zip
 
 # Force update documentation during analysis
-npm run dev -- analyze path/to/your/trace.zip --update-docs
+npm run dev -- analyze path/to/your/onboarding-trace.zip --update-docs
 
 # Disable RAG functionality (don't use documentation)
-npm run dev -- analyze path/to/your/trace.zip --no-rag
-
-# Using environment variables
-ANTHROPIC_API_KEY=your-key-here npm run dev -- analyze path/to/your/trace.zip -v
+npm run dev -- analyze path/to/your/onboarding-trace.zip --no-rag
 ```
 
 ### Interactive Chat
@@ -78,19 +67,13 @@ For a simple interactive chat with the trace analysis assistant, use the `chat` 
 
 ```bash
 # Start a basic chat session
-npm run dev -- chat path/to/your/trace.zip
-
-# With your Anthropic API key
-npm run dev -- chat path/to/your/trace.zip -k your-api-key
-
-# With verbose processing logs
-npm run dev -- chat path/to/your/trace.zip -v
+npm run dev -- chat path/to/your/event-trace.zip
 
 # Force update documentation during chat
-npm run dev -- chat path/to/your/trace.zip --update-docs
+npm run dev -- chat path/to/your/event-trace.zip --update-docs
 
 # Save chat transcript to file
-npm run dev -- chat path/to/your/trace.zip -o chat-transcript.json
+npm run dev -- chat path/to/your/event-trace.zip -o chat-transcript.json
 ```
 
 During the chat session:
@@ -104,25 +87,19 @@ The orchestrated workflow provides more flexibility and control over the analysi
 
 ```bash
 # Basic orchestrated analysis
-npm run dev -- analyze-orchestrated path/to/your/trace.zip
+npm run dev -- analyze-orchestrated path/to/your/onboarding-trace.zip
 
 # With retries enabled (3 retries with exponential backoff)
-npm run dev -- analyze-orchestrated path/to/your/trace.zip -r
-
-# With conditional context gathering (skips context step for low severity issues)
-npm run dev -- analyze-orchestrated path/to/your/trace.zip -c
+npm run dev -- analyze-orchestrated path/to/your/onboarding-trace.zip -r
 
 # Force update documentation during orchestrated analysis
-npm run dev -- analyze-orchestrated path/to/your/trace.zip --update-docs
+npm run dev -- analyze-orchestrated path/to/your/onboarding-trace.zip --update-docs
 
 # Disable RAG functionality (don't use documentation)
-npm run dev -- analyze-orchestrated path/to/your/trace.zip --no-rag
+npm run dev -- analyze-orchestrated path/to/your/onboarding-trace.zip --no-rag
 
 # With all options enabled
-npm run dev -- analyze-orchestrated path/to/your/trace.zip -r -c -p -v
-
-# Using environment variables
-ANTHROPIC_API_KEY=your-key-here npm run dev -- analyze-orchestrated path/to/your/trace.zip -r -c -p
+npm run dev -- analyze-orchestrated path/to/your/onboarding-trace.zip -r -c -p -v
 ```
 
 Options for the orchestrated workflow:
@@ -140,19 +117,16 @@ For interactive chat using the orchestrated workflow, use the `chat-orchestrated
 
 ```bash
 # Start a chat session using the orchestrated workflow
-npm run dev -- chat-orchestrated path/to/your/trace.zip
+npm run dev -- chat-orchestrated path/to/your/event-trace.zip
 
 # With workflow options
-npm run dev -- chat-orchestrated path/to/your/trace.zip -r -c -p
-
-# With your Anthropic API key
-npm run dev -- chat-orchestrated path/to/your/trace.zip -k your-api-key
+npm run dev -- chat-orchestrated path/to/your/event-trace.zip -r -c -p
 
 # Force update documentation during chat
-npm run dev -- chat-orchestrated path/to/your/trace.zip --update-docs
+npm run dev -- chat-orchestrated path/to/your/event-trace.zip --update-docs
 
 # Save chat transcript to file
-npm run dev -- chat-orchestrated path/to/your/trace.zip -o chat-transcript.json
+npm run dev -- chat-orchestrated path/to/your/event-trace.zip -o chat-transcript.json
 ```
 
 During the chat session:
@@ -204,7 +178,7 @@ npm run enhance-docs
 npm run update-docs
 
 # Force update documentation during analysis
-npm run dev -- analyze path/to/your/trace.zip --update-docs
+npm run dev -- analyze path/to/your/onboarding-trace.zip --update-docs
 ```
 
 ### Disabling RAG
@@ -213,18 +187,10 @@ If you prefer to run the tool without using documentation retrieval:
 
 ```bash
 # Disable RAG for standard analysis
-npm run dev -- analyze path/to/your/trace.zip --no-rag
+npm run dev -- analyze path/to/your/onboarding-trace.zip --no-rag
 
 # Disable RAG for orchestrated analysis
-npm run dev -- analyze-orchestrated path/to/your/trace.zip --no-rag
+npm run dev -- analyze-orchestrated path/to/your/onboarding-trace.zip --no-rag
 ```
 
 By default, RAG is enabled (`--rag` is set to true). When you use the `--no-rag` flag, the tool will not initialize the documentation provider, and AI responses will be based solely on the trace data without additional documentation context.
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details. 
