@@ -278,22 +278,6 @@ Both workflows integrate these essential components:
 2. **RAG (Retrieval Augmented Generation)**: Enhances AI responses with relevant Playwright documentation
 3. **Interactive Chat**: Maintains conversation history and provides contextual responses
 
-### Workflow Comparison
-
-| Feature | Standard Workflow | Orchestrated Workflow |
-|---------|------------------|----------------------|
-| **Execution Order** | Fixed, linear | Dynamic, dependency-based |
-| **Planning** | Static, predetermined | Dynamic, created by orchestrator |
-| **Parallelism** | None | Possible for independent tasks |
-| **Adaptability** | Fixed pipeline | Adapts to specific test failure patterns |
-| **Error Recovery** | Basic error handling | Granular retry mechanisms |
-| **Implementation Complexity** | Simple | More complex with dependency resolution |
-| **Performance** | Consistent, predictable | Potentially faster for complex traces |
-| **Resource Usage** | Lower | Higher due to orchestration overhead |
-| **Best Use Case** | Simple, common failures | Complex, unusual failure patterns |
-
-Choose the standard workflow for straightforward analysis with predictable results, or the orchestrated workflow for more complex test failures that may benefit from adaptive analysis.
-
 ## Documentation Management
 
 The tool uses a documentation directory located at `data/docs/` to store Playwright documentation for the RAG functionality:
@@ -331,3 +315,32 @@ npm run dev -- analyze-orchestrated path/to/onboarding-trace.zip --no-rag
 ```
 
 By default, RAG is enabled (`--rag` is set to true). When you use the `--no-rag` flag, the tool will not initialize the documentation provider, and AI responses will be based solely on the trace data without additional documentation context.
+
+
+### Future Considerations for Production-readiness
+- For Production we can support multiple models like OpenAI’s, Google’s Gemini model but we need to have OpenAIModelProvider its just a few lines of codes. 
+
+- If one provider fails we can try with other one because sometimes apis are down from those providers. 
+
+- We can add streaming for better UX during long generations, so that user does not wait for the end of the llm completion. 
+
+- We can add mechanisms to evaluate our approaches & models. (Realtime eval + dataset based eval)
+
+- Track token usage and associated costs. (Langchain already provides it, we can make use of it I believe.)
+
+- In order for our approaches to be scalable, we can have a queue based architecture for handling many requests. 
+
+- Instead of fetching the playwright docs from GitHub playwright md files, we can have a scraper written in playwright test, which crawls the playwright documentation webpage. Also we can deploy this playwright test to checkly so that it will periodically update the RAG docs.
+
+- We can implement a re-usable prompt templates and we can use based on the agent we want, it could be something like enum or a constant.
+
+- We can implement fully Autonomous Autofix Agent (requires test.spec.ts file).
+
+- We can implement Observability with metrics, logging, and tracing. 
+
+- We can add Alert system for failures or anomalies. 
+
+- We can support visual analysis of screenshots from traces.
+
+
+
