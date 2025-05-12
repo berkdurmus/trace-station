@@ -35,7 +35,7 @@ npm run update-docs
 The tool uses AI models that require API keys. You can provide them in several ways:
 
 
-1. Use a .env file in the project root:
+1. Use a .env file in the project root: (Since this is a private repo shared by 2-3 people, I provided my Anthropic and OpenAI API keys, feel free to use it.
    ```
    ANTHROPIC_API_KEY = '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'
    OPENAI_API_KEY = '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'
