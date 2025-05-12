@@ -318,6 +318,7 @@ By default, RAG is enabled (`--rag` is set to true). When you use the `--no-rag`
 
 
 ### Future Considerations for Production-readiness
+
 - For Production we can support multiple models like OpenAI’s, Google’s Gemini model but we need to have OpenAIModelProvider its just a few lines of codes. 
 
 - If one provider fails we can try with other one because sometimes apis are down from those providers. 
