@@ -15,7 +15,7 @@ TraceStation (Not by Sony) is an AI-powered debugging assistant for Playwright t
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/trace-station.git
+git clone https://github.com/berkdurmus/trace-station.git
 cd trace-station
 
 # Install dependencies
@@ -46,13 +46,13 @@ The tool uses AI models that require API keys. You can provide them in several w
 
 ```bash
 # Basic analysis
-npm run dev -- analyze path/to/onboarding-trace.zip
+npm run dev -- analyze data/samples/onboarding-trace.zip
 
 # Force update documentation during analysis
-npm run dev -- analyze path/to/onboarding-trace.zip --update-docs
+npm run dev -- analyze data/samples/onboarding-trace.zip --update-docs
 
 # Disable RAG functionality (don't use documentation)
-npm run dev -- analyze path/to/onboarding-trace.zip --no-rag
+npm run dev -- analyze data/samples/onboarding-trace.zip --no-rag
 ```
 
 ### Interactive Chat
@@ -61,13 +61,13 @@ For a simple interactive chat with the trace analysis assistant, use the `chat` 
 
 ```bash
 # Start a basic chat session
-npm run dev -- chat path/to/onboarding-trace.zip
+npm run dev -- chat data/samples/onboarding-trace.zip
 
 # Force update documentation during chat
-npm run dev -- chat path/to/onboarding-trace.zip --update-docs
+npm run dev -- chat data/samples/onboarding-trace.zip --update-docs
 
 # Save chat transcript to file
-npm run dev -- chat path/to/onboarding-trace.zip -o chat-transcript.json
+npm run dev -- chat data/samples/onboarding-trace.zip -o chat-transcript.json
 ```
 
 During the chat session:
@@ -81,19 +81,19 @@ The orchestrated workflow provides more flexibility and control over the analysi
 
 ```bash
 # Basic orchestrated analysis
-npm run dev -- analyze-orchestrated path/to/onboarding-trace.zip
+npm run dev -- analyze-orchestrated data/samples/onboarding-trace.zip
 
 # With retries enabled (3 retries with exponential backoff)
-npm run dev -- analyze-orchestrated path/to/onboarding-trace.zip -r
+npm run dev -- analyze-orchestrated data/samples/onboarding-trace.zip -r
 
 # Force update documentation during orchestrated analysis
-npm run dev -- analyze-orchestrated path/to/onboarding-trace.zip --update-docs
+npm run dev -- analyze-orchestrated data/samples/onboarding-trace.zip --update-docs
 
 # Disable RAG functionality (don't use documentation)
-npm run dev -- analyze-orchestrated path/to/onboarding-trace.zip --no-rag
+npm run dev -- analyze-orchestrated data/samples/onboarding-trace.zip --no-rag
 
 # With all options enabled
-npm run dev -- analyze-orchestrated path/to/onboarding-trace.zip -r -c -p -v
+npm run dev -- analyze-orchestrated data/samples/onboarding-trace.zip -r -c -p -v
 ```
 
 Options for the orchestrated workflow:
@@ -111,16 +111,16 @@ For interactive chat using the orchestrated workflow, use the `chat-orchestrated
 
 ```bash
 # Start a chat session using the orchestrated workflow
-npm run dev -- chat-orchestrated path/to/onboarding-trace.zip
+npm run dev -- chat-orchestrated data/samples/onboarding-trace.zip
 
 # With workflow options
-npm run dev -- chat-orchestrated path/to/onboarding-trace.zip -r -c -p
+npm run dev -- chat-orchestrated data/samples/onboarding-trace.zip -r -c -p
 
 # Force update documentation during chat
-npm run dev -- chat-orchestrated path/to/onboarding-trace.zip --update-docs
+npm run dev -- chat-orchestrated data/samples/onboarding-trace.zip --update-docs
 
 # Save chat transcript to file
-npm run dev -- chat-orchestrated path/to/onboarding-trace.zip -o chat-transcript.json
+npm run dev -- chat-orchestrated data/samples/onboarding-trace.zip -o chat-transcript.json
 ```
 
 During the chat session:
@@ -299,7 +299,7 @@ npm run enhance-docs
 npm run update-docs
 
 # Force update documentation during analysis
-npm run dev -- analyze path/to/onboarding-trace.zip --update-docs
+npm run dev -- analyze data/samples/onboarding-trace.zip --update-docs
 ```
 
 ### Disabling RAG
@@ -308,10 +308,10 @@ If you prefer to run the tool without using documentation retrieval:
 
 ```bash
 # Disable RAG for standard analysis
-npm run dev -- analyze path/to/onboarding-trace.zip --no-rag
+npm run dev -- analyze data/samples/onboarding-trace.zip --no-rag
 
 # Disable RAG for orchestrated analysis
-npm run dev -- analyze-orchestrated path/to/onboarding-trace.zip --no-rag
+npm run dev -- analyze-orchestrated data/samples/onboarding-trace.zip --no-rag
 ```
 
 By default, RAG is enabled (`--rag` is set to true). When you use the `--no-rag` flag, the tool will not initialize the documentation provider, and AI responses will be based solely on the trace data without additional documentation context.
