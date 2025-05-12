@@ -346,3 +346,13 @@ By default, RAG is enabled (`--rag` is set to true). When you use the `--no-rag`
 - This is a full CLI app, we can create backend api + frontend for this. 
 
 
+#### Comparing the current AI Analysis Agent on Checkly versus my Orchestrator-Worker Workflow
+
+- One of my tests fails due to it redirects to Cloudflare Gateway time-out page, when I run AI Analysis Agent on Checkly website, it does not give the reason of the error (its related to third party API issue.) However, Orchestrator-worker workflow I have finds this cause correctly. 
+
+<img width="1024" alt="Screenshot 2025-05-11 at 23 07 26" src="https://github.com/user-attachments/assets/da7cd424-ddf1-43b2-a445-43daf300dedb" />
+
+<img width="1402" alt="Screenshot 2025-05-11 at 23 10 13" src="https://github.com/user-attachments/assets/d335dd12-444e-49a9-a7dd-77ace663f023" />
+
+
+
