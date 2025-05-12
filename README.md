@@ -345,6 +345,11 @@ By default, RAG is enabled (`--rag` is set to true). When you use the `--no-rag`
 
 - This is a full CLI app, we can create backend api + frontend for this. 
 
+- We can allow users to add specialized agents for their specific testing patterns and frameworks.
+
+- We can add webhooks and APIs for integration with popular CI/CD platforms.
+
+
 
 #### Comparing the current AI Analysis Agent on Checkly versus my Orchestrator-Worker Workflow
 
