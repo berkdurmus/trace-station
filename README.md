@@ -321,6 +321,8 @@ By default, RAG is enabled (`--rag` is set to true). When you use the `--no-rag`
 
 - Queue-Based Architecture for Trace Processing: To ensure scalability with increasing demand, we can implement an asynchronous message queue system that efficiently manages multiple concurrent trace analysis requests while maintaining optimal system performance and reliability.
 
+- Creating Error Classes & Error Handlers & Logging.
+
 - Persistent Vector DB: Currently, we are re-creating vector store from scratch everytime. Persistent DB can preserve embeddings between sessions, eliminating repeated processing.
 
 - Evaluation: We can add mechanisms to evaluate our approaches & models. (Realtime eval + dataset based eval).
@@ -332,8 +334,6 @@ By default, RAG is enabled (`--rag` is set to true). When you use the `--no-rag`
 - Improve RAG: We can apply re-ranking to improve quality of relevant docs. 
 
 - BE + FE: This is a full CLI app, we can create backend api + frontend for this.
-
-- Better errorHandling. Adding error service, handles many errors based on circumstances.
 
 - Observability: We can implement Observability with metrics, logging, and tracing. 
 
