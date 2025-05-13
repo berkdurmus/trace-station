@@ -319,31 +319,37 @@ By default, RAG is enabled (`--rag` is set to true). When you use the `--no-rag`
 
 ### Future Considerations for Production-readiness
 
-- For Production we can support multiple models like OpenAI’s, Google’s Gemini model but we need to have OpenAIModelProvider its just a few lines of codes. 
+- Persistent Vector DB: Currently, we are re-creating vector store from scratch everytime. Persistent DB can preserve embeddings between sessions, eliminating repeated processing.
 
-- If one provider fails we can try with other one because sometimes apis are down from those providers. 
+- Evaluation: We can add mechanisms to evaluate our approaches & models. (Realtime eval + dataset based eval).
 
-- We can add streaming for better UX during long generations, so that user does not wait for the end of the llm completion. 
+- Streaming: We can add streaming for better UX during long generations, so that user does not wait for the end of the llm completion. 
 
-- We can add mechanisms to evaluate our approaches & models. (Realtime eval + dataset based eval)
+- Queue based architecture: In order for our approaches to be scalable, we can have a queue based architecture for handling many requests. 
 
-- Track token usage and associated costs. (Langchain already provides it, we can make use of it I believe.)
+- Prompt Management: We can implement a re-usable prompt templates and we can use based on the agent we want, it could be something like enum or a constant.
 
-- In order for our approaches to be scalable, we can have a queue based architecture for handling many requests. 
+- BE + FE: This is a full CLI app, we can create backend api + frontend for this.
 
-- Instead of fetching the playwright docs from GitHub playwright md files, we can have a scraper written in playwright test, which crawls the playwright documentation webpage. Also we can deploy this playwright test to checkly so that it will periodically update the RAG docs.
+- Better errorHandling.
 
-- We can implement a re-usable prompt templates and we can use based on the agent we want, it could be something like enum or a constant.
+- Observability: We can implement Observability with metrics, logging, and tracing. 
+
+- Monitoring: Track token usage and associated costs. (Langchain already provides it, we can make use of it I believe.).
+
+- Feedback from User: (thumbs up/down): We can get user feedback on trace analysis' and use it next time, when we are diagnosing and issue. 
 
 - We can implement fully Autonomous Autofix Agent (requires test.spec.ts file).
 
-- We can implement Observability with metrics, logging, and tracing. 
+- For Production we can support multiple models like OpenAI’s, Google’s Gemini model but we need to have OpenAIModelProvider its just a few lines of codes. 
+
+- If one provider fails we can try with other one because sometimes apis are down from those providers.
+
+- Improve trace We can support visual analysis of screenshots from traces.
+
+- Instead of fetching the playwright docs from GitHub playwright md files, we can have a scraper written in playwright test, which crawls the playwright documentation webpage. Also we can deploy this playwright test to checkly so that it will periodically update the RAG docs.
 
 - We can add Alert system for failures or anomalies. 
-
-- We can support visual analysis of screenshots from traces.
-
-- This is a full CLI app, we can create backend api + frontend for this. 
 
 - We can allow users to add specialized agents for their specific testing patterns and frameworks.
 
