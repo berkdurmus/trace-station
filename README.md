@@ -329,6 +329,8 @@ By default, RAG is enabled (`--rag` is set to true). When you use the `--no-rag`
 
 - Prompt Management: We can implement a re-usable prompt templates and we can use based on the agent we want, it could be something like enum or a constant.
 
+- Improve RAG: We can apply re-ranking to improve quality of relevant docs. 
+
 - BE + FE: This is a full CLI app, we can create backend api + frontend for this.
 
 - Better errorHandling. Adding error service, handles many errors based on circumstances.
