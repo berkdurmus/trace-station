@@ -323,6 +323,8 @@ By default, RAG is enabled (`--rag` is set to true). When you use the `--no-rag`
 
 - Creating Error Classes & Error Handlers & Logging.
 
+- API: We can create API + routes for trace analysis, we can use it + combine with our other existing production apis. 
+
 - Persistent Vector DB: Currently, we are re-creating vector store from scratch everytime. Persistent DB can preserve embeddings between sessions, eliminating repeated processing.
 
 - Evaluation: We can add mechanisms to evaluate our approaches & models. (Realtime eval + dataset based eval).
@@ -332,8 +334,6 @@ By default, RAG is enabled (`--rag` is set to true). When you use the `--no-rag`
 - Prompt Management: We can implement a re-usable prompt templates and we can use based on the agent we want, it could be something like enum or a constant.
 
 - Improve RAG: We can apply re-ranking to improve quality of relevant docs. 
-
-- BE + FE: This is a full CLI app, we can create backend api + frontend for this.
 
 - Observability: We can implement Observability with metrics, logging, and tracing. 
 
