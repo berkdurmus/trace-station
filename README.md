@@ -319,13 +319,13 @@ By default, RAG is enabled (`--rag` is set to true). When you use the `--no-rag`
 
 ### Future Considerations for Production-readiness
 
+- Queue-Based Architecture for Trace Processing: To ensure scalability with increasing demand, we can implement an asynchronous message queue system that efficiently manages multiple concurrent trace analysis requests while maintaining optimal system performance and reliability.
+
 - Persistent Vector DB: Currently, we are re-creating vector store from scratch everytime. Persistent DB can preserve embeddings between sessions, eliminating repeated processing.
 
 - Evaluation: We can add mechanisms to evaluate our approaches & models. (Realtime eval + dataset based eval).
 
 - Streaming: We can add streaming for better UX during long generations, so that user does not wait for the end of the llm completion. 
-
-- Queue based architecture: In order for our approaches to be scalable, we can have a queue based architecture for handling many requests. 
 
 - Prompt Management: We can implement a re-usable prompt templates and we can use based on the agent we want, it could be something like enum or a constant.
 
