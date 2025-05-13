@@ -331,13 +331,15 @@ By default, RAG is enabled (`--rag` is set to true). When you use the `--no-rag`
 
 - BE + FE: This is a full CLI app, we can create backend api + frontend for this.
 
-- Better errorHandling.
+- Better errorHandling. Adding error service, handles many errors based on circumstances.
 
 - Observability: We can implement Observability with metrics, logging, and tracing. 
 
 - Monitoring: Track token usage and associated costs. (Langchain already provides it, we can make use of it I believe.).
 
-- Feedback from User: (thumbs up/down): We can get user feedback on trace analysis' and use it next time, when we are diagnosing and issue. 
+- Feedback from User: (thumbs up/down): We can get user feedback on trace analysis' and use it next time, when we are diagnosing and issue.
+
+- Batch processing multiple independent test traces. 
 
 - We can implement fully Autonomous Autofix Agent (requires test.spec.ts file).
 
