@@ -360,4 +360,18 @@ By default, RAG is enabled (`--rag` is set to true). When you use the `--no-rag`
 <img width="1402" alt="Screenshot 2025-05-11 at 23 10 13" src="https://github.com/user-attachments/assets/d335dd12-444e-49a9-a7dd-77ace663f023" />
 
 
+### Trouble Shooting
+
+- On my older mac when I try to run 'npm run dev -- analyze data/samples/onboarding-trace.zip' it was giving me error related to ReadableStream. Here Here are a few ways to fix this:
+Upgrade Node.js - The ReadableStream API is available in newer versions of Node.js. Try updating to Node.js v18+ which has more Web APIs built in. I'm using NVM. Basically below solves: 
+ ```bash
+nvm use 18.19.1
+```
+or Add polyfill package - Install the web-streams-polyfill package:
+```bash
+npm install web-streams-polyfill
+```
+
+
+
 
