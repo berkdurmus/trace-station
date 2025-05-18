@@ -137,8 +137,6 @@ ${doc.content}
       // First try direct parsing with the StructuredOutputParser
       const parsedOutput = await this.outputParser.parse(output);
 
-      console.log("context:", parsedOutput);
-
       return {
         result: {
           relevantDocumentation: parsedOutput.relevantDocumentation || [],

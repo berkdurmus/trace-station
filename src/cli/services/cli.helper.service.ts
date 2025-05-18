@@ -237,102 +237,180 @@ export function displayFullAnalysisResults(
   trace: ParsedTrace,
   workflowResult: WorkflowResult
 ) {
-  console.log("\n" + chalk.bold.blue("Test Information:"));
-  console.log(`Test: ${chalk.bold(trace.testTitle || "Unknown")}`);
+  const divider = "─────────────────────────────────────────────────";
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━
+  // HEADER: Basic test info
+  // ━━━━━━━━━━━━━━━━━━━━━━━━
+  console.log(chalk.bold("\n🔍 TRACE ANALYSIS REPORT"));
+
+  // Test title and status
+  console.log(divider);
+  console.log(`Test:    ${chalk.bold(trace.testTitle || "Unknown")}`);
+  const statusColor =
+    trace.testResult.status === "passed" ? chalk.green : chalk.red;
+  console.log(`Status:  ${statusColor(trace.testResult.status.toUpperCase())}`);
   console.log(
-    `Status: ${
-      trace.testResult.status === "passed"
-        ? chalk.green(trace.testResult.status.toUpperCase())
-        : chalk.red(trace.testResult.status.toUpperCase())
+    `Browser: ${trace.browser.name}${
+      trace.browser.version ? ` v${trace.browser.version}` : ""
     }`
   );
-  console.log(
-    `Browser: ${chalk.bold(
-      trace.browser.name +
-        (trace.browser.version ? ` v${trace.browser.version}` : "")
-    )}`
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━
+  // SECTION 1: Root cause - the most important info
+  // ━━━━━━━━━━━━━━━━━━━━━━━━
+  if (workflowResult.diagnosis?.result.rootCause) {
+    console.log(divider);
+    console.log(chalk.yellow.bold("ROOT CAUSE"));
+    console.log(workflowResult.diagnosis.result.rootCause);
+
+    // Only show explanation if it adds value beyond the root cause
+    const explanation = workflowResult.diagnosis?.result.explanation;
+    if (
+      explanation &&
+      !explanation.includes(workflowResult.diagnosis.result.rootCause)
+    ) {
+      console.log(`\n${explanation}`);
+    }
+  }
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━
+  // SECTION 2: Action items - what to do
+  // ━━━━━━━━━━━━━━━━━━━━━━━━
+  const recommendations =
+    workflowResult.recommendation?.result.recommendations || [];
+  if (recommendations.length > 0) {
+    console.log(divider);
+    console.log(chalk.green.bold("RECOMMENDED ACTIONS"));
+
+    // Limit to top 3 most important recommendations
+    const topRecommendations = recommendations.slice(0, 3);
+    topRecommendations.forEach((rec, i) => {
+      console.log(`${i + 1}. ${rec}`);
+    });
+
+    // Show remaining count if applicable
+    if (recommendations.length > 3) {
+      const remaining = recommendations.length - 3;
+      console.log(
+        chalk.dim(
+          `\n...and ${remaining} more recommendation${
+            remaining > 1 ? "s" : ""
+          }.`
+        )
+      );
+    }
+  }
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━
+  // SECTION 3: Code example (if available)
+  // ━━━━━━━━━━━━━━━━━━━━━━━━
+  const codeFixes = workflowResult.recommendation?.result.codeFixes || [];
+  if (codeFixes.length > 0) {
+    console.log(divider);
+    console.log(chalk.cyan.bold("CODE SOLUTION"));
+
+    // Only show the first code solution
+    console.log(codeFixes[0]);
+
+    // Show count of additional fixes if there are more
+    if (codeFixes.length > 1) {
+      console.log(chalk.dim(`\nAdditional code solutions available.`));
+    }
+  }
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━
+  // SECTION 4: Technical details - for those who want more info
+  // ━━━━━━━━━━━━━━━━━━━━━━━━
+  console.log(divider);
+  console.log(chalk.blue.bold("TECHNICAL DETAILS"));
+
+  // Error message
+  if (trace.testResult.error?.message) {
+    const errorFirstLine = trace.testResult.error.message.split("\n")[0]; // Just first line
+    console.log(`Error: ${chalk.red(errorFirstLine)}`);
+  }
+
+  // Failure point
+  if (workflowResult.analysis?.result.failurePoint) {
+    console.log(`Where: ${workflowResult.analysis.result.failurePoint}`);
+  }
+
+  // Network failures (if any)
+  const failedRequests = trace.networkRequests.filter(
+    (req) => (req.status && req.status >= 400) || req.error
   );
 
-  // Display network stats if available
-  if (trace.networkRequests && trace.networkRequests.length > 0) {
-    console.log("\n" + chalk.bold.cyan("Network Information:"));
-    console.log(`Total Requests: ${chalk.bold(trace.networkRequests.length)}`);
-
-    // Group by status code
-    const statusCounts = getNetworkStatusCounts(trace.networkRequests);
-    for (const [status, count] of Object.entries(statusCounts)) {
-      let statusColor = chalk.blue;
-      if (status === "400") statusColor = chalk.yellow;
-      if (status === "500") statusColor = chalk.red;
-      console.log(`  ${statusColor(`${status}s Responses`)}: ${count}`);
-    }
-
-    // Show failed requests if any
-    const failedRequests = trace.networkRequests.filter(
-      (req) => req.status && req.status >= 400
-    );
-
-    if (failedRequests.length > 0) {
-      console.log("\n" + chalk.bold.yellow("Failed Network Requests:"));
-      failedRequests.slice(0, 5).forEach((req, i) => {
-        console.log(
-          `  ${i + 1}. ${chalk.red(req.url || "Unknown URL")} - Status ${
-            req.status
-          }`
-        );
-      });
-
-      if (failedRequests.length > 5) {
-        console.log(
-          `  ...and ${failedRequests.length - 5} more failed requests`
-        );
-      }
-    }
-  }
-
-  // Display analysis results
-  if (workflowResult.analysis) {
-    displayAnalysis(workflowResult.analysis);
-  }
-
-  // Display context information
-  if (workflowResult.context) {
-    displayContext(workflowResult.context);
-  }
-
-  // Display diagnosis
-  if (workflowResult.diagnosis) {
-    displayDiagnosis(workflowResult.diagnosis);
-  }
-
-  // Display recommendations
-  if (workflowResult.recommendation) {
-    displayRecommendations(workflowResult.recommendation);
-  }
-
-  // Display synthesis if available
-  if (workflowResult.synthesis) {
-    console.log("\n" + chalk.bold.magenta("AI Synthesis:"));
-
-    if (workflowResult.synthesis.result.synthesis) {
-      console.log(workflowResult.synthesis.result.synthesis);
-    } else {
-      console.log(JSON.stringify(workflowResult.synthesis.result, null, 2));
-    }
-
+  if (failedRequests.length > 0) {
     console.log(
-      "\n" +
-        chalk.gray(
-          "This is a high-level synthesis combining results from all analysis agents."
-        )
+      `Network: ${failedRequests.length} failed request${
+        failedRequests.length > 1 ? "s" : ""
+      }`
     );
+
+    // Show only the first failed request as an example
+    if (failedRequests.length > 0) {
+      const req = failedRequests[0];
+      const shortUrl =
+        req.url.length > 50 ? req.url.substring(0, 47) + "..." : req.url;
+
+      console.log(
+        `  → ${req.method || "GET"} ${shortUrl} (${req.status || "Error"})`
+      );
+    }
   }
 
-  // Display error if any
-  if (workflowResult.error) {
-    console.log("\n" + chalk.bold.red("Error:"));
-    console.log(workflowResult.error);
+  // ━━━━━━━━━━━━━━━━━━━━━━━━
+  // SECTION 5: Resources - documentation & best practices
+  // ━━━━━━━━━━━━━━━━━━━━━━━━
+  const docRefs = workflowResult.context?.result.documentationReferences || [];
+  const bestPractices =
+    workflowResult.recommendation?.result.bestPractices || [];
+
+  if (docRefs.length > 0 || bestPractices.length > 0) {
+    console.log(divider);
+    console.log(chalk.magenta.bold("RESOURCES & BEST PRACTICES"));
+
+    // Documentation references
+    if (docRefs.length > 0) {
+      // Only show up to 2 doc references
+      const refs = docRefs.slice(0, 2);
+      refs.forEach((ref) => {
+        // Extract URL if present
+        const urlMatch = ref.match(/(https?:\/\/[^\s)]+)/);
+        if (urlMatch) {
+          console.log(`• ${chalk.underline(urlMatch[0])}`);
+        } else {
+          console.log(`• ${ref}`);
+        }
+      });
+    }
+
+    // Best practices
+    if (bestPractices.length > 0) {
+      if (docRefs.length > 0) console.log(""); // Add spacing if we already showed docs
+
+      // Show only the first best practice
+      console.log(`Pro tip: ${bestPractices[0]}`);
+    }
   }
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━
+  // FOOTER: What to do next
+  // ━━━━━━━━━━━━━━━━━━━━━━━━
+  console.log(divider);
+  console.log(chalk.bold("NEXT STEPS"));
+  console.log(
+    `• Run ${chalk.cyan("chat")} command to interactively explore this analysis`
+  );
+  console.log(
+    `• Add ${chalk.cyan(
+      "--output filename.json"
+    )} to save full analysis details`
+  );
+
+  // End marker
+  console.log(divider);
 }
 
 export function getSeverityColor(

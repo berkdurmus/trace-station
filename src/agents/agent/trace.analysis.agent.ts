@@ -79,8 +79,6 @@ Based on the provided trace information, identify what failed in this test.
       // First try direct parsing with the StructuredOutputParser
       const parsedOutput = await this.outputParser.parse(output);
 
-      console.log("trace analysis:", parsedOutput);
-
       return {
         result: {
           failurePoint: parsedOutput.failurePoint,
