@@ -242,57 +242,8 @@ export async function setupAnalyzeCLI(program: Command) {
             const jsonOutput = formatResultsAsJson(parsedTrace, result);
             console.log(JSON.stringify(jsonOutput, null, 2));
           } else {
-            // Display results in human-readable format
-            console.log("\n" + chalk.bold.blue("Test Information:"));
-            console.log(
-              `Test: ${chalk.bold(parsedTrace.testTitle || "Unknown")}`
-            );
-            console.log(
-              `Status: ${
-                parsedTrace.testResult.status === "passed"
-                  ? chalk.green(parsedTrace.testResult.status.toUpperCase())
-                  : chalk.red(parsedTrace.testResult.status.toUpperCase())
-              }`
-            );
-            console.log(
-              `Browser: ${chalk.bold(
-                parsedTrace.browser.name +
-                  (parsedTrace.browser.version
-                    ? ` v${parsedTrace.browser.version}`
-                    : "")
-              )}`
-            );
-            console.log(
-              `Duration: ${chalk.bold(
-                Math.round(parsedTrace.duration.total / 1000)
-              )}s`
-            );
-
-            // Show analysis results
-            if (result.analysis) {
-              displayAnalysis(result.analysis);
-            }
-
-            // Show context results
-            if (result.context) {
-              displayContext(result.context);
-            }
-
-            // Show diagnosis results
-            if (result.diagnosis) {
-              displayDiagnosis(result.diagnosis);
-            }
-
-            // Show recommendation results
-            if (result.recommendation) {
-              displayRecommendations(result.recommendation);
-            }
-
-            // Show error if any
-            if (result.error) {
-              console.log("\n" + chalk.bold.red("Error:"));
-              console.log(result.error);
-            }
+            // Display results using the improved common display function
+            displayFullAnalysisResults(parsedTrace, result);
 
             console.log(
               chalk.yellow(

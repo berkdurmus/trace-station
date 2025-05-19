@@ -104,8 +104,6 @@ Based on the provided trace information and any relevant documentation, provide 
       // First try direct parsing with the StructuredOutputParser
       const parsedOutput = await this.outputParser.parse(output);
 
-      console.log("diagnosis:", parsedOutput);
-
       return {
         result: {
           rootCause: parsedOutput.rootCause,
