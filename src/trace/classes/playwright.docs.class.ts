@@ -4,25 +4,33 @@ import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { OpenAIEmbeddings } from "@langchain/openai";
 import * as fs from "fs";
 import * as path from "path";
-import { MemoryVectorStore } from "langchain/vectorstores/memory";
+import { FaissStore } from "@langchain/community/vectorstores/faiss";
 import { DocumentationChunk } from "../interfaces";
+import { CachedEmbeddings } from "./cached.embeddings";
 
 export class PlaywrightDocs {
-  private vectorStore: MemoryVectorStore;
+  private vectorStore: FaissStore | null = null;
   private isInitialized: boolean = false;
   private apiKey?: string;
   private verbose: boolean = false;
+  private storePath: string;
+  private embeddings: CachedEmbeddings;
 
   constructor(apiKey?: string, verbose: boolean = false) {
     this.apiKey = apiKey;
     this.verbose = verbose;
+    this.storePath = path.join(__dirname, "../../../data/vector_db");
 
-    // Use OpenAIEmbeddings with API key from constructor or environment variable
-    this.vectorStore = new MemoryVectorStore(
-      new OpenAIEmbeddings({
-        openAIApiKey: this.apiKey || process.env.OPENAI_API_KEY,
-      })
-    );
+    // Create directory for vector store if it doesn't exist
+    if (!fs.existsSync(this.storePath)) {
+      fs.mkdirSync(this.storePath, { recursive: true });
+    }
+
+    // Initialize embeddings with caching enabled
+    this.embeddings = new CachedEmbeddings({
+      apiKey: this.apiKey || process.env.OPENAI_API_KEY,
+      enableCache: true,
+    });
   }
 
   private log(message: string): void {
@@ -31,12 +39,58 @@ export class PlaywrightDocs {
     }
   }
 
+  /**
+   * Get embedding cache statistics
+   */
+  public getEmbeddingCacheStats(): {
+    hits: number;
+    misses: number;
+    hitRate: number;
+    size: number;
+  } {
+    const stats = this.embeddings.getCacheStats();
+    return {
+      ...stats,
+      size: this.embeddings.getCacheSize(),
+    };
+  }
+
+  /**
+   * Clear the embedding cache
+   */
+  public clearEmbeddingCache(): void {
+    this.embeddings.clearCache();
+    this.log("Embedding cache cleared");
+  }
+
   async initialize(): Promise<void> {
     if (this.isInitialized) return;
 
     this.log("Initializing Playwright documentation...");
-    // Load documentation from local files
-    await this.loadLocalDocumentation();
+
+    // Check if we have an existing vector store
+    const indexPath = path.join(this.storePath, "faiss.index");
+    const docStorePath = path.join(this.storePath, "docstore.json");
+
+    if (fs.existsSync(indexPath) && fs.existsSync(docStorePath)) {
+      // Load the existing vector store
+      this.log("Loading existing vector store...");
+      this.vectorStore = await FaissStore.load(this.storePath, this.embeddings);
+      this.log("Vector store loaded successfully.");
+    } else {
+      // Create a new vector store
+      this.log("Creating new vector store...");
+      this.vectorStore = await FaissStore.fromTexts(
+        ["Initial document"],
+        [{ source: "initialization" }],
+        this.embeddings
+      );
+      // Save the empty vector store
+      await this.vectorStore.save(this.storePath);
+
+      // Load documentation
+      await this.loadLocalDocumentation();
+    }
 
     this.isInitialized = true;
     this.log("Documentation initialization complete.");
@@ -92,10 +146,22 @@ export class PlaywrightDocs {
     }
 
     // Add documents to vector store
-    if (documents.length > 0) {
+    if (documents.length > 0 && this.vectorStore) {
       this.log(`Adding ${documents.length} document chunks to vector store...`);
       await this.vectorStore.addDocuments(documents);
+      // Save the updated vector store
+      await this.vectorStore.save(this.storePath);
       this.log("Documents added to vector store successfully.");
+    } else if (!this.vectorStore) {
+      this.log("Vector store not initialized.");
+      // Initialize with documents
+      this.vectorStore = await FaissStore.fromDocuments(
+        documents,
+        this.embeddings
+      );
+      // Save the vector store
+      await this.vectorStore.save(this.storePath);
+      this.log("Vector store created with documents.");
     } else {
       console.warn("No documentation files found, creating placeholder docs");
       await this.createPlaceholderDocs();
@@ -236,7 +302,19 @@ Flaky tests pass sometimes and fail other times, often due to:
     }
 
     // Add documents to vector store
-    await this.vectorStore.addDocuments(documents);
+    if (this.vectorStore) {
+      await this.vectorStore.addDocuments(documents);
+      // Save the updated vector store
+      await this.vectorStore.save(this.storePath);
+    } else {
+      // Initialize with documents
+      this.vectorStore = await FaissStore.fromDocuments(
+        documents,
+        this.embeddings
+      );
+      // Save the vector store
+      await this.vectorStore.save(this.storePath);
+    }
   }
 
   async retrieveRelevantDocs(
@@ -298,6 +376,11 @@ Flaky tests pass sometimes and fail other times, often due to:
     this.log(`Query: ${query}`);
 
     // Search for relevant docs
+    if (!this.vectorStore) {
+      this.log("Vector store not initialized.");
+      return [];
+    }
+
     const results = await this.vectorStore.similaritySearch(query, 5);
 
     // Filter results to focus on the most relevant
