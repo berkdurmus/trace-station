@@ -398,6 +398,21 @@ This results in:
 
 For more details on the caching implementation, see [LLM_CACHING.md](./LLM_CACHING.md).
 
+### Prompt Optimization
+
+The project implements intelligent prompt optimization techniques that reduce token usage and improve performance:
+
+1. Smart content prioritization that emphasizes critical information
+2. Content-aware compression that reduces redundancy
+3. System prompt optimization for conciseness
+
+This results in:
+- Up to 77% reduction in prompt size for large traces
+- Lower API costs through reduced token usage
+- Faster response times with smaller, more focused prompts
+
+For more details on the prompt optimization implementation, see [PROMPT_OPTIMIZATION.md](./PROMPT_OPTIMIZATION.md).
+
 
 
 
