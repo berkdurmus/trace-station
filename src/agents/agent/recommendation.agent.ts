@@ -1,14 +1,26 @@
 import { BaseAgent } from "./base.agent";
-import { AgentInput, RecommendationOutput } from "@/agents";
+import {
+  AgentInput,
+  ILanguageModelProvider,
+  RecommendationOutput,
+} from "@/agents";
 import { ParsedTrace } from "@/trace";
 import { z } from "zod";
 import { StructuredOutputParser } from "langchain/output_parsers";
-import { ILanguageModelProvider } from "@/agents";
+import { RecommendationPromptOptimizer } from "@/utils/recommendation.prompt.optimizer";
 
 export class RecommendationAgent extends BaseAgent<RecommendationOutput> {
   private outputParser: StructuredOutputParser<any>;
+  private promptOptimizer: RecommendationPromptOptimizer;
 
-  constructor(apiKey?: string, modelProvider?: ILanguageModelProvider) {
+  constructor(
+    apiKey?: string,
+    modelProvider?: ILanguageModelProvider,
+    cacheOptions?: {
+      enableCache?: boolean;
+      cacheTTL?: number;
+    }
+  ) {
     const systemPrompt = `
 You are an expert at recommending fixes for Playwright test failures. Your task is to provide actionable
 recommendations that help developers fix their failing tests quickly and effectively.
@@ -23,7 +35,10 @@ Focus on:
 Your recommendations should be practical, technically sound, and easy to implement.
     `;
 
-    super(systemPrompt, modelProvider, apiKey);
+    super(systemPrompt, modelProvider, apiKey, cacheOptions);
+
+    // Initialize the prompt optimizer
+    this.promptOptimizer = new RecommendationPromptOptimizer();
 
     // Create parser for structured output
     this.outputParser = StructuredOutputParser.fromZodSchema(
@@ -47,94 +62,12 @@ Your recommendations should be practical, technically sound, and easy to impleme
   }
 
   async formatInput(input: AgentInput): Promise<string> {
-    const { trace, context } = input;
-
-    // Format trace data for agent input
-    const traceSummary = this.formatTraceSummary(trace);
-    const actionsSummary = this.formatActionsSummary(trace);
-    const errorsSummary = this.formatErrorsSummary(trace);
-
-    // Include context data if available
-    let previousAnalysis = "";
-    let diagnosisData = "";
-    let relevantDocumentation = "";
-    let contextData = "";
-
-    if (context?.analysisResult) {
-      previousAnalysis = `
-Analysis Results:
-${JSON.stringify(context.analysisResult, null, 2)}
-      `;
-    }
-
-    if (context?.diagnosisResult) {
-      diagnosisData = `
-Diagnosis Results:
-${JSON.stringify(context.diagnosisResult, null, 2)}
-      `;
-    }
-
-    // Include relevant documentation from context if available
-    if (
-      context?.context?.result?.relevantDocumentation &&
-      context.context.result.relevantDocumentation.length > 0
-    ) {
-      relevantDocumentation = `
-Relevant Documentation:
-${context.context.result.relevantDocumentation
-  .map((doc: string, i: number) => `${i + 1}. ${doc}`)
-  .join("\n")}
-      `;
-    }
-
-    // Include context agent's common patterns and suggestions
-    if (context?.context?.result) {
-      const contextResult = context.context.result;
-      if (
-        contextResult.commonPatterns &&
-        contextResult.commonPatterns.length > 0
-      ) {
-        contextData += `
-Common Patterns Identified:
-${contextResult.commonPatterns
-  .map((pattern: string, i: number) => `${i + 1}. ${pattern}`)
-  .join("\n")}
-        `;
-      }
-
-      if (contextResult.suggestions && contextResult.suggestions.length > 0) {
-        contextData += `
-Suggestions from Context Analysis:
-${contextResult.suggestions
-  .map((suggestion: string, i: number) => `${i + 1}. ${suggestion}`)
-  .join("\n")}
-        `;
-      }
-    }
-
-    const format_instructions = this.outputParser.getFormatInstructions();
-
-    return `
-${this.systemPrompt}
-
-Test Information:
-${traceSummary}
-
-Actions Timeline:
-${actionsSummary}
-
-Errors:
-${errorsSummary}
-
-${previousAnalysis}
-${diagnosisData}
-${relevantDocumentation}
-${contextData}
-
-${format_instructions}
-
-Based on the provided trace information, previous analysis, and documentation, provide detailed recommendations to fix this test failure.
-    `;
+    // Use the prompt optimizer to generate an optimized prompt
+    return this.promptOptimizer.generatePrompt(
+      input,
+      this.systemPrompt,
+      this.outputParser.getFormatInstructions()
+    );
   }
 
   async parseOutput(output: string): Promise<RecommendationOutput> {

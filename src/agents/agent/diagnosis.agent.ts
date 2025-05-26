@@ -3,9 +3,11 @@ import { AgentInput, DiagnosisOutput, ILanguageModelProvider } from "@/agents";
 import { ParsedTrace } from "@/trace";
 import { z } from "zod";
 import { StructuredOutputParser } from "langchain/output_parsers";
+import { DiagnosisPromptOptimizer } from "@/utils/diagnosis.prompt.optimizer";
 
 export class DiagnosisAgent extends BaseAgent<DiagnosisOutput> {
   private outputParser: StructuredOutputParser<any>;
+  private promptOptimizer: DiagnosisPromptOptimizer;
 
   constructor(
     apiKey?: string,
@@ -31,6 +33,9 @@ exactly what went wrong and why.
 
     super(systemPrompt, modelProvider, apiKey, cacheOptions);
 
+    // Initialize the prompt optimizer
+    this.promptOptimizer = new DiagnosisPromptOptimizer();
+
     // Create parser for structured output
     this.outputParser = StructuredOutputParser.fromZodSchema(
       z.object({
@@ -44,66 +49,12 @@ exactly what went wrong and why.
   }
 
   async formatInput(input: AgentInput): Promise<string> {
-    const { trace, context } = input;
-
-    // Format trace data for agent input
-    const traceSummary = this.formatTraceSummary(trace);
-    const actionsSummary = this.formatActionsSummary(trace);
-    const errorsSummary = this.formatErrorsSummary(trace);
-    const networkSummary = this.formatNetworkSummary(trace);
-    const consoleSummary = this.formatConsoleSummary(trace);
-
-    // Include any previous analysis from other agents if available
-    let previousAnalysis = "";
-    if (context?.analysisResult) {
-      previousAnalysis = `
-Previous Analysis:
-${JSON.stringify(context.analysisResult, null, 2)}
-      `;
-    }
-
-    // Include relevant documentation from the context agent if available
-    let relevantDocumentation = "";
-    if (
-      context?.context?.result?.relevantDocumentation &&
-      context.context.result.relevantDocumentation.length > 0
-    ) {
-      relevantDocumentation = `
-Relevant Documentation from Context:
-${context.context.result.relevantDocumentation
-  .map((doc: string, i: number) => `${i + 1}. ${doc}`)
-  .join("\n")}
-      `;
-    }
-
-    const format_instructions = this.outputParser.getFormatInstructions();
-
-    return `
-${this.systemPrompt}
-
-Test Information:
-${traceSummary}
-
-Actions Timeline:
-${actionsSummary}
-
-Errors:
-${errorsSummary}
-
-Network Requests:
-${networkSummary}
-
-Console Messages:
-${consoleSummary}
-
-${previousAnalysis}
-
-${relevantDocumentation}
-
-${format_instructions}
-
-Based on the provided trace information and any relevant documentation, provide a detailed diagnosis of the root cause of this test failure.
-    `;
+    // Use the prompt optimizer to generate an optimized prompt
+    return this.promptOptimizer.generatePrompt(
+      input,
+      this.systemPrompt,
+      this.outputParser.getFormatInstructions()
+    );
   }
 
   async parseOutput(output: string): Promise<DiagnosisOutput> {
