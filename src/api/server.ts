@@ -2,6 +2,7 @@ import express, { Application } from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { config } from "dotenv";
+import http from "http";
 
 // Import routes
 import traceRoutes from "./routes/trace.routes";
@@ -11,11 +12,15 @@ import systemRoutes from "./routes/system.routes";
 // Import processor
 import { TraceProcessor } from "./services/trace.processor";
 
+// Import tracing
+import { initTracing, shutdownTracing } from "./utils/tracing";
+
 // Load environment variables
 config();
 
 class ApiServer {
   public app: Application;
+  private server!: http.Server;
   private port: number;
   private traceProcessor: TraceProcessor;
 
@@ -62,11 +67,42 @@ class ApiServer {
     });
   }
 
+  public registerShutdownHandlers(): void {
+    const gracefulShutdown = async () => {
+      console.log("Shutting down gracefully...");
+
+      // Stop trace processor
+      this.traceProcessor.stop();
+
+      // Allow 10 seconds for existing connections to complete
+      const serverClose = new Promise((resolve) => this.server.close(resolve));
+
+      // Shutdown tracing
+      await shutdownTracing();
+
+      // Wait for server to close
+      await serverClose;
+
+      console.log("Shutdown complete");
+      process.exit(0);
+    };
+
+    // Register shutdown handlers
+    process.on("SIGTERM", gracefulShutdown);
+    process.on("SIGINT", gracefulShutdown);
+  }
+
   public async start(): Promise<void> {
+    // Initialize OpenTelemetry
+    initTracing();
+
     // Start the HTTP server
-    this.app.listen(this.port, () => {
+    this.server = this.app.listen(this.port, () => {
       console.log(`Server is running on port ${this.port}`);
     });
+
+    // Register shutdown handlers
+    this.registerShutdownHandlers();
 
     // Start the trace processor
     try {
