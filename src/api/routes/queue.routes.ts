@@ -10,4 +10,10 @@ router.get("/status", queueController.getQueueStatus);
 // Reprocess a failed trace
 router.post("/reprocess/:id", queueController.reprocessTrace);
 
+// Get failed messages from DLQ
+router.get("/failed", queueController.getFailedMessages);
+
+// Redrive a specific message from DLQ
+router.post("/redrive/:receiptHandle", queueController.redriveMessage);
+
 export default router;

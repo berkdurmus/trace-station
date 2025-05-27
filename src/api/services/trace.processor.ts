@@ -1,6 +1,8 @@
 import { SQSService } from "./sqs.service";
 import { AgentType } from "@/agents/interfaces/agent.interface";
 import { TraceResponse } from "../interfaces";
+import { traced } from "../utils/tracing";
+import { Span } from "@opentelemetry/api";
 
 // In-memory trace storage (replace with database in production)
 declare global {
@@ -108,64 +110,84 @@ export class TraceProcessor {
     this.currentlyProcessing++;
 
     try {
-      // Parse message body
-      const body = JSON.parse(message.Body);
-      const traceId = body.traceId;
+      await traced("TraceProcessor.processMessage", async (span: Span) => {
+        // Parse message body
+        const body = JSON.parse(message.Body || "{}");
+        const traceId = body.traceId;
 
-      if (!traceId) {
-        console.error("Message missing traceId:", body);
-        await this.sqsService.deleteMessage(message.ReceiptHandle);
-        this.currentlyProcessing--;
-        return;
-      }
+        span.setAttribute("traceProcessor.traceId", traceId || "unknown");
+        span.setAttribute(
+          "traceProcessor.messageId",
+          message.MessageId || "unknown"
+        );
 
-      console.log(`Processing trace ${traceId}`);
-
-      // Update trace status
-      if (global.traces[traceId]) {
-        global.traces[traceId].status = "processing";
-      }
-
-      // Process the trace
-      try {
-        // Here we would actually process the trace using the agent system
-        // For now, we'll simulate processing with a delay
-        await this.simulateProcessing(body);
-
-        // Update trace with results
-        if (global.traces[traceId]) {
-          global.traces[traceId].status = "completed";
-          global.traces[traceId].completedAt = new Date().toISOString();
-          global.traces[traceId].results = {
-            diagnosis: {
-              rootCause: "Simulated root cause",
-              confidence: 0.85,
-              explanation: "This is a simulated diagnosis result",
-            },
-            recommendations: [
-              "Simulated recommendation 1",
-              "Simulated recommendation 2",
-            ],
-          };
+        if (!traceId) {
+          console.error("Message missing traceId:", body);
+          await this.sqsService.deleteMessage(message.ReceiptHandle || "");
+          this.currentlyProcessing--;
+          return;
         }
 
-        console.log(`Successfully processed trace ${traceId}`);
-      } catch (processingError: unknown) {
-        console.error(`Error processing trace ${traceId}:`, processingError);
+        console.log(`Processing trace ${traceId}`);
 
-        // Update trace with error
+        // Update trace status
         if (global.traces[traceId]) {
-          global.traces[traceId].status = "failed";
-          global.traces[traceId].error = `Processing error: ${
+          global.traces[traceId].status = "processing";
+        }
+
+        // Process the trace
+        try {
+          // Here we would actually process the trace using the agent system
+          // For now, we'll simulate processing with a delay
+          await this.simulateProcessing(body);
+
+          // Update trace with results
+          if (global.traces[traceId]) {
+            global.traces[traceId].status = "completed";
+            global.traces[traceId].completedAt = new Date().toISOString();
+            global.traces[traceId].results = {
+              diagnosis: {
+                rootCause: "Simulated root cause",
+                confidence: 0.85,
+                explanation: "This is a simulated diagnosis result",
+              },
+              recommendations: [
+                "Simulated recommendation 1",
+                "Simulated recommendation 2",
+              ],
+            };
+          }
+
+          span.setAttribute("traceProcessor.status", "completed");
+          console.log(`Successfully processed trace ${traceId}`);
+        } catch (processingError: unknown) {
+          console.error(`Error processing trace ${traceId}:`, processingError);
+
+          // Update trace with error
+          if (global.traces[traceId]) {
+            global.traces[traceId].status = "failed";
+            global.traces[traceId].error = `Processing error: ${
+              processingError instanceof Error
+                ? processingError.message
+                : "Unknown error"
+            }`;
+          }
+
+          span.setAttribute("traceProcessor.status", "failed");
+          span.setAttribute(
+            "traceProcessor.error",
             processingError instanceof Error
               ? processingError.message
               : "Unknown error"
-          }`;
-        }
-      }
+          );
 
-      // Delete the message from the queue
-      await this.sqsService.deleteMessage(message.ReceiptHandle);
+          // Re-throw to mark span as failed
+          throw processingError;
+        }
+
+        // Delete the message from the queue
+        await this.sqsService.deleteMessage(message.ReceiptHandle || "");
+      });
     } catch (error) {
       console.error("Error handling message:", error);
       // Don't delete the message so it can be retried
