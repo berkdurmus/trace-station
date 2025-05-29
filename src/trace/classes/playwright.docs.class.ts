@@ -7,6 +7,7 @@ import * as path from "path";
 import { FaissStore } from "@langchain/community/vectorstores/faiss";
 import { DocumentationChunk } from "../interfaces";
 import { CachedEmbeddings } from "./cached.embeddings";
+import AnalyticsService from "../services/analytics.service";
 
 export class PlaywrightDocs {
   private vectorStore: FaissStore | null = null;
@@ -15,6 +16,7 @@ export class PlaywrightDocs {
   private verbose: boolean = false;
   private storePath: string;
   private embeddings: CachedEmbeddings;
+  private analytics: AnalyticsService;
 
   constructor(apiKey?: string, verbose: boolean = false) {
     this.apiKey = apiKey;
@@ -31,6 +33,9 @@ export class PlaywrightDocs {
       apiKey: this.apiKey || process.env.OPENAI_API_KEY,
       enableCache: true,
     });
+
+    // Initialize analytics service
+    this.analytics = new AnalyticsService(verbose);
   }
 
   private log(message: string): void {
@@ -381,7 +386,9 @@ Flaky tests pass sometimes and fail other times, often due to:
       return [];
     }
 
+    const startTime = Date.now();
     const results = await this.vectorStore.similaritySearch(query, 5);
+    const latencyMs = Date.now() - startTime;
 
     // Filter results to focus on the most relevant
     const filteredResults = results
@@ -390,10 +397,41 @@ Flaky tests pass sometimes and fail other times, often due to:
 
     this.log(`Found ${filteredResults.length} relevant documentation matches.`);
 
+    // Track query in ClickHouse analytics
+    try {
+      await this.analytics.trackQuery({
+        query,
+        numResults: filteredResults.length,
+        latencyMs,
+        traceId: trace.testFile || "unknown", // Using testFile as a trace identifier
+      });
+    } catch (error) {
+      this.log(`Error tracking query analytics: ${error}`);
+      // Don't let analytics failures impact the main functionality
+    }
+
     // Format results
-    return filteredResults.map((doc) => {
+    const formattedResults = filteredResults.map((doc) => {
       const metadata = doc.metadata as any;
       const source = this.formatDocumentSource(metadata.source, metadata.url);
+
+      // Get relevance score if available, otherwise use 1.0 as default
+      const relevanceScore = (doc as any)._score || 1.0;
+
+      // Track document retrieval in ClickHouse
+      try {
+        this.analytics
+          .trackDocRetrieval({
+            docId: metadata.source || "unknown",
+            docTitle: metadata.title || "Unknown",
+            query,
+            relevanceScore,
+            traceId: trace.testFile || "unknown", // Using testFile as a trace identifier
+          })
+          .catch((err) => this.log(`Error tracking doc retrieval: ${err}`));
+      } catch (error) {
+        this.log(`Error tracking document retrieval: ${error}`);
+      }
 
       return {
         title: metadata.title || "Unknown",
@@ -406,6 +444,31 @@ Flaky tests pass sometimes and fail other times, often due to:
             : doc.pageContent,
       };
     });
+
+    // Track trace analytics
+    try {
+      // Create a unique trace ID by combining test file and title
+      const traceId = `${trace.testFile || "unknown"}-${
+        trace.testTitle || "unknown"
+      }`;
+
+      this.analytics
+        .trackTrace({
+          traceId,
+          testFile: trace.testFile || "",
+          testTitle: trace.testTitle || "",
+          durationMs: trace.duration.total || 0, // Use total duration
+          status: trace.testResult?.status || "unknown",
+          errorMessage: trace.testResult?.error?.message || "",
+          actionCount: trace.actions?.length || 0,
+          errorCount: trace.errors?.length || 0,
+        })
+        .catch((err) => this.log(`Error tracking trace: ${err}`));
+    } catch (error) {
+      this.log(`Error tracking trace analytics: ${error}`);
+    }
+
+    return formattedResults;
   }
 
   // Helper to format a readable document source from file path and URL
