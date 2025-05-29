@@ -15,7 +15,8 @@
     "cli": "ts-node src/ui/cli.ts",
     "fetch-docs": "ts-node -r tsconfig-paths/register src/trace/services/fetch.docs.service.ts",
     "enhance-docs": "ts-node -r tsconfig-paths/register src/trace/services/enhance.docs.service.ts",
-    "update-docs": "npm run fetch-docs && npm run enhance-docs"
+    "update-docs": "npm run fetch-docs && npm run enhance-docs",
+    "test-analytics": "ts-node -r tsconfig-paths/register src/test-analytics.ts"
   },
   "keywords": [],
   "author": "",
@@ -31,6 +32,7 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "@clickhouse/client": "^0.2.10",
     "@langchain/anthropic": "^0.3.20",
     "@langchain/community": "^0.3.42",
     "@langchain/core": "^0.3.53",
