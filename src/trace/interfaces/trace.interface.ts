@@ -49,7 +49,17 @@ export interface ScreenshotData {
   title?: string;
 }
 
+export interface DOMSnapshotData {
+  timestamp: number;
+  html: string;
+  cssSelector?: string;
+  xpath?: string;
+  title?: string;
+  url?: string;
+}
+
 export interface ParsedTrace {
+  id?: string; // Unique ID for the trace
   testTitle?: string;
   testFile?: string;
   browser: {
@@ -61,6 +71,7 @@ export interface ParsedTrace {
   networkRequests: NetworkRequest[];
   consoleMessages: ConsoleMessage[];
   screenshots: ScreenshotData[];
+  domSnapshots?: DOMSnapshotData[]; // Added DOM snapshots
   errors: {
     message: string;
     stack?: string;
@@ -77,5 +88,11 @@ export interface ParsedTrace {
       message: string;
       stack?: string;
     };
+  };
+  multiModalAnalysis?: {
+    isAnalyzed: boolean;
+    rootCause?: string;
+    failureTimestamp?: number;
+    explanation?: string;
   };
 }
