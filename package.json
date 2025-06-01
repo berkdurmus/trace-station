@@ -16,7 +16,8 @@
     "fetch-docs": "ts-node -r tsconfig-paths/register src/trace/services/fetch.docs.service.ts",
     "enhance-docs": "ts-node -r tsconfig-paths/register src/trace/services/enhance.docs.service.ts",
     "update-docs": "npm run fetch-docs && npm run enhance-docs",
-    "test-analytics": "ts-node -r tsconfig-paths/register src/test-analytics.ts"
+    "test-analytics": "ts-node -r tsconfig-paths/register src/test-analytics.ts",
+    "test-multimodal": "ts-node -r tsconfig-paths/register src/test-multimodal.ts"
   },
   "keywords": [],
   "author": "",
