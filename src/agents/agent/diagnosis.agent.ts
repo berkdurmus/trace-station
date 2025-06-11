@@ -7,7 +7,14 @@ import { StructuredOutputParser } from "langchain/output_parsers";
 export class DiagnosisAgent extends BaseAgent<DiagnosisOutput> {
   private outputParser: StructuredOutputParser<any>;
 
-  constructor(apiKey?: string, modelProvider?: ILanguageModelProvider) {
+  constructor(
+    apiKey?: string,
+    modelProvider?: ILanguageModelProvider,
+    cacheOptions?: {
+      enableCache?: boolean;
+      cacheTTL?: number;
+    }
+  ) {
     const systemPrompt = `
 You are an expert at diagnosing Playwright test failures and identifying root causes. Your task is to 
 analyze test failures in detail and provide a clear diagnosis of what went wrong.
@@ -22,7 +29,7 @@ Your diagnosis should be precise, technically accurate, and helpful for develope
 exactly what went wrong and why.
     `;
 
-    super(systemPrompt, modelProvider, apiKey);
+    super(systemPrompt, modelProvider, apiKey, cacheOptions);
 
     // Create parser for structured output
     this.outputParser = StructuredOutputParser.fromZodSchema(

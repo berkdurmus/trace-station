@@ -323,7 +323,7 @@ By default, RAG is enabled (`--rag` is set to true). When you use the `--no-rag`
 
 - Evaluation: We can add mechanisms to evaluate our approaches & models. (Realtime eval + dataset based eval).
 
-- Streaming: We can add streaming for better UX during long generations, so that user does not wait for the end of the llm completion. 
+- Streaming: We can add streaming for better UX during long generations, so that user does not wait for the end of the llm completion. 
 
 - Prompt Management: We can implement a re-usable prompt templates and we can use based on the agent we want, it could be something like enum or a constant.
 
@@ -331,7 +331,7 @@ By default, RAG is enabled (`--rag` is set to true). When you use the `--no-rag`
 
 - Observability: We can implement Observability with metrics, logging, and tracing. 
 
-- Monitoring: Track token usage and associated costs. (Langchain already provides it, we can make use of it I believe.).
+- Monitoring: Track token usage and associated costs. (Langchain already provides it, we can make use of it I believe.).
 
 - Feedback from User: (thumbs up/down): We can get user feedback on trace analysis' and use it next time, when we are diagnosing and issue.
 
@@ -339,7 +339,7 @@ By default, RAG is enabled (`--rag` is set to true). When you use the `--no-rag`
 
 - We can implement fully Autonomous Autofix Agent (requires test.spec.ts file).
 
-- For Production we can support multiple models like OpenAI’s, Google’s Gemini model but we need to have OpenAIModelProvider its just a few lines of codes. 
+- For Production we can support multiple models like OpenAI's, Google's Gemini model but we need to have OpenAIModelProvider its just a few lines of codes. 
 
 - If one provider fails we can try with other one because sometimes apis are down from those providers.
 
@@ -347,7 +347,7 @@ By default, RAG is enabled (`--rag` is set to true). When you use the `--no-rag`
 
 - Instead of fetching the playwright docs from GitHub playwright md files, we can have a scraper written in playwright test, which crawls the playwright documentation webpage. Also we can deploy this playwright test to checkly so that it will periodically update the RAG docs.
 
-- We can add Alert system for failures or anomalies. 
+- We can add Alert system for failures or anomalies. 
 
 - We can allow users to add specialized agents for their specific testing patterns and frameworks.
 
@@ -375,6 +375,22 @@ or Add polyfill package - Install the web-streams-polyfill package:
 ```bash
 npm install web-streams-polyfill
 ```
+
+## Performance Optimizations
+
+### LLM Caching
+
+The project includes an LLM caching implementation that significantly improves performance by:
+
+1. Caching LLM responses for identical prompts, eliminating redundant API calls
+2. Caching embeddings for vector search operations
+
+This results in:
+- Faster response times (cached LLM responses return in milliseconds vs. seconds)
+- Reduced API costs
+- Better user experience with more consistent performance
+
+For more details on the caching implementation, see [LLM_CACHING.md](./LLM_CACHING.md).
 
 
 
